@@ -15,6 +15,10 @@ st.title("Employee Attrition Prediction")
 # Sidebar Inputs
 st.sidebar.header("Employee Features")
 
+# Initialize session state for resetting prediction
+if "reset_prediction" not in st.session_state:
+    st.session_state.reset_prediction = False
+
 # Helper function to clean and convert numeric inputs
 def clean_and_convert_input(input_value):
     try:
@@ -100,8 +104,15 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
+# Reset Prediction Result
+if st.sidebar.button("Reset Prediction"):
+    st.session_state.reset_prediction = True
+else:
+    st.session_state.reset_prediction = False
+
 # Process and Predict Button
 if st.button("Predict"):
+    st.session_state.reset_prediction = False
     try:
         # Ensure numeric and categorical types
         numeric_columns = preprocessor.transformers[0][2]
@@ -124,8 +135,9 @@ if st.button("Predict"):
 
         # Display predictions
         st.subheader("Prediction Results")
-        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-        st.write(f"Will the employee leave? **{prediction}**")
+        if not st.session_state.reset_prediction:
+            prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+            st.write(f"Will the employee leave? **{prediction}**")
 
     except Exception as e:
         st.error(f"Error during processing: {e}")
