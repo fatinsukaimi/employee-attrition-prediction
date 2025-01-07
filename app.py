@@ -47,6 +47,9 @@ gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
 education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3)
 
+# Whether input (if applicable)
+whether = st.sidebar.selectbox("Whether (Yes/No)", ["Yes", "No"])
+
 # Convert input into DataFrame
 input_data = pd.DataFrame({
     "Age": [int(age)],
@@ -79,33 +82,31 @@ input_data = pd.DataFrame({
     "Gender": [gender],
     "Department": [department],
     "Education": [int(education)],
+    "Whether": [1 if whether == "Yes" else 0],
 })
 
-# Debugging: Show input data and its types
-st.write("Input Data for Preprocessing:")
-st.write(input_data)
-st.write("Data Types:")
-st.write(input_data.dtypes)
+# Check for missing or invalid values
+if input_data.isnull().values.any():
+    st.error("Error: Some input values are missing. Please ensure all inputs are filled.")
+else:
+    try:
+        input_array = preprocessor.transform(input_data)
 
-# Preprocess input data
-try:
-    input_array = preprocessor.transform(input_data)
+        # Predict using Neural Network
+        nn_predictions = nn_model.predict(input_array).flatten()
 
-    # Predict using Neural Network
-    nn_predictions = nn_model.predict(input_array).flatten()
+        # Create hybrid features
+        input_hybrid = np.column_stack((input_array, nn_predictions))
 
-    # Create hybrid features
-    input_hybrid = np.column_stack((input_array, nn_predictions))
+        # Predict using Hybrid NN-XGBoost
+        hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-    # Predict using Hybrid NN-XGBoost
-    hybrid_predictions = hybrid_model.predict(input_hybrid)
+        # Display predictions
+        st.subheader("Prediction Results")
+        if hybrid_predictions[0] == 1:
+            st.write("The employee is likely to leave the company.")
+        else:
+            st.write("The employee is likely to stay in the company.")
 
-    # Display predictions
-    st.subheader("Prediction Results")
-    if hybrid_predictions[0] == 1:
-        st.write("The employee is likely to leave the company.")
-    else:
-        st.write("The employee is likely to stay in the company.")
-
-except Exception as e:
-    st.error(f"Error during preprocessing: {e}")
+    except Exception as e:
+        st.error(f"Error during preprocessing: {e}")
