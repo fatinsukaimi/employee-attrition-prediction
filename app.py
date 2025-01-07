@@ -81,12 +81,15 @@ input_data = pd.DataFrame({
     "Education": [int(education)],
 })
 
+# Debug Input Data
+st.write("Debug: Input Data Before Preprocessing")
+st.write(input_data)
+
 # Check for missing or invalid values
 if input_data.isnull().values.any():
     st.error("Error: Some input values are missing. Please ensure all inputs are filled.")
 else:
     try:
-        # Preprocess input data
         input_array = preprocessor.transform(input_data)
 
         # Predict using Neural Network
