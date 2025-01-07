@@ -110,31 +110,26 @@ if st.button("Predict"):
         st.write(input_data.dtypes)
 
         # Ensure correct data types
-        numeric_columns = ["Age", "MonthlyIncome", "MonthlyRate", "PercentSalaryHike", "YearsWithCurrManager", 
-                           "JobInvolvement", "YearsAtCompany", "JobSatisfaction", "StockOptionLevel", 
-                           "HourlyRate", "DailyRate", "PerformanceRating", "YearsInCurrentRole", 
-                           "TrainingTimesLastYear", "DistanceFromHome", "YearsSinceLastPromotion", 
-                           "TotalWorkingYears", "NumCompaniesWorked"]
-
-        categorical_columns = ["OverTime", "BusinessTravel", "EducationField", "MaritalStatus", "Gender", 
-                               "Department", "JobRole"]
-
+        numeric_columns = preprocessor.transformers[0][2]
         input_data[numeric_columns] = input_data[numeric_columns].astype("float64")
+
+        categorical_columns = preprocessor.transformers[1][2]
         input_data[categorical_columns] = input_data[categorical_columns].astype(str)
 
         # Preprocess input data
         input_array = preprocessor.transform(input_data)
-        st.write("Preprocessed Input Array:")
-        st.write(input_array)
+        st.write("Preprocessed Input Array Shape:", input_array.shape)
 
-        # Neural Network Predictions
+        # Predict using Neural Network
         nn_predictions = nn_model.predict(input_array).flatten()
+        st.write("Neural Network Predictions (Raw):", nn_predictions)
 
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
         # Hybrid Model Predictions
         hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]
+        st.write("Hybrid Model Probabilities (Yes):", hybrid_probabilities)
 
         # Add a slider to adjust the decision threshold
         threshold = st.slider("Adjust Decision Threshold", 0.0, 1.0, 0.5, 0.05)
