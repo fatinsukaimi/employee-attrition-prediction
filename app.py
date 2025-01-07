@@ -47,7 +47,7 @@ gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
 education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3)
 
-# Encode categorical variables to match preprocessor expectations
+# Encode categorical variables
 marital_status_mapping = {"Single": 0, "Married": 1, "Divorced": 2}
 business_travel_mapping = {"Non-Travel": 0, "Travel_Rarely": 1, "Travel_Frequently": 2}
 gender_mapping = {"Male": 0, "Female": 1}
@@ -89,8 +89,7 @@ input_data = pd.DataFrame({
 })
 
 try:
-    # Debugging: Print Input Data
-    st.write("Debug: Input Data Before Preprocessing")
+    st.write("Debug: Input Data")
     st.write(input_data)
 
     # Preprocess input data
