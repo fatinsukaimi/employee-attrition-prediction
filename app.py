@@ -104,28 +104,39 @@ if monthly_income is not None and monthly_rate is not None:
         "Education": [int(education)],
     })
 
+try:
+    # Debug preprocessor expectations
+    st.write("Preprocessor Expected Feature Names:")
     try:
-        st.write("Debug: Input Data Types")
-        st.write(input_data.dtypes)
-        st.write("Debug: Input Data Values")
-        st.write(input_data)
+        expected_columns = preprocessor.feature_names_in_  # For sklearn < 1.0
+    except AttributeError:
+        expected_columns = preprocessor.get_feature_names_out()  # For sklearn >= 1.0
+    st.write(expected_columns)
 
-        # Preprocess input data
-        input_array = preprocessor.transform(input_data)
+    # Align input_data columns to match preprocessor expectations
+    input_data = input_data[expected_columns]
 
-        # Predict using Neural Network
-        nn_predictions = nn_model.predict(input_array).flatten()
+    # Debug aligned input data
+    st.write("Aligned Input Data:")
+    st.write(input_data)
 
-        # Create hybrid features
-        input_hybrid = np.column_stack((input_array, nn_predictions))
+    # Preprocess input data
+    input_array = preprocessor.transform(input_data)
 
-        # Predict using Hybrid NN-XGBoost
-        hybrid_predictions = hybrid_model.predict(input_hybrid)
+    # Predict using Neural Network
+    nn_predictions = nn_model.predict(input_array).flatten()
 
-        # Display predictions
-        st.subheader("Prediction Results")
-        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-        st.write(f"Will the employee leave? **{prediction}**")
+    # Create hybrid features
+    input_hybrid = np.column_stack((input_array, nn_predictions))
 
-    except Exception as e:
-        st.error(f"Error during preprocessing: {e}")
+    # Predict using Hybrid NN-XGBoost
+    hybrid_predictions = hybrid_model.predict(input_hybrid)
+
+    # Display predictions
+    st.subheader("Prediction Results")
+    prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+    st.write(f"Will the employee leave? **{prediction}**")
+
+except Exception as e:
+    st.error(f"Error during preprocessing: {e}")
+
