@@ -4,23 +4,10 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 
-# Cache the model to load it only once per session
-@st.cache_resource
-def load_nn_model():
-    return load_model("nn_model.keras")
-
-@st.cache_resource
-def load_hybrid_model():
-    return joblib.load("hybrid_model.pkl")
-
-@st.cache_resource
-def load_preprocessor():
-    return joblib.load("preprocessor.pkl")
-
 # Load models and preprocessor
-nn_model = load_nn_model()
-hybrid_model = load_hybrid_model()
-preprocessor = load_preprocessor()
+nn_model = load_model("nn_model.keras")
+hybrid_model = joblib.load("hybrid_model.pkl")
+preprocessor = joblib.load("preprocessor.pkl")
 
 # Title
 st.title("Employee Attrition Prediction")
@@ -41,16 +28,8 @@ def clean_and_convert_input(input_value):
 age = st.sidebar.slider("Age", 18, 65, 30)
 monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
 monthly_income = clean_and_convert_input(monthly_income_input)
-if monthly_income is None or monthly_income <= 0:
-    st.error("Please enter a valid Monthly Income greater than 0.")
-    st.stop()
-
 monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000")
 monthly_rate = clean_and_convert_input(monthly_rate_input)
-if monthly_rate is None or monthly_rate <= 0:
-    st.error("Please enter a valid Monthly Rate greater than 0.")
-    st.stop()
-
 overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
@@ -121,28 +100,30 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
-# Predict Button
+# Process and Predict Button
 if st.button("Predict"):
     try:
-        # Preprocess input data
+        # Preprocess
         input_array = preprocessor.transform(input_data)
 
-        # Neural Network Probabilities
+        # Predict using Neural Network
         nn_predictions = nn_model.predict(input_array).flatten()
 
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
-        # Hybrid Model Probabilities
-        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]  # Probability of "Yes"
-        st.write(f"Prediction Probability (Yes): {hybrid_probabilities[0]:.2f}")
+        # Predict probabilities using Hybrid NN-XGBoost
+        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]
 
         # Add a slider to adjust the decision threshold
         threshold = st.slider("Adjust Decision Threshold", 0.0, 1.0, 0.5, 0.05)
 
-        # Adjust prediction based on the threshold
+        # Make prediction based on threshold
         prediction = "Yes" if hybrid_probabilities[0] > threshold else "No"
         st.subheader(f"Prediction Result (Threshold={threshold}): **{prediction}**")
+
+        # Show probability
+        st.write(f"Probability of 'Yes': {hybrid_probabilities[0]:.2f}")
 
     except Exception as e:
         st.error(f"Error during prediction: {e}")
