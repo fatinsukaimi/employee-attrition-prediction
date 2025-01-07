@@ -15,7 +15,22 @@ st.title("Employee Attrition Prediction")
 # Sidebar Inputs
 st.sidebar.header("Employee Features")
 age = st.sidebar.slider("Age", 18, 65, 30)
-monthly_income = st.sidebar.number_input("Monthly Income (e.g., 5000)", min_value=1000, step=500)
+
+# Helper function to clean numeric input with commas
+def clean_numeric_input(input_value, default_value=0):
+    try:
+        return int(str(input_value).replace(",", "").strip())
+    except ValueError:
+        return default_value
+
+# Monthly Income Input
+monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="1000")
+monthly_income = clean_numeric_input(monthly_income_input)
+
+# Monthly Rate Input
+monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000")
+monthly_rate = clean_numeric_input(monthly_rate_input)
+
 overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
@@ -32,7 +47,6 @@ hourly_rate = st.sidebar.number_input("Hourly Rate (e.g., 40)", min_value=10, ma
 daily_rate = st.sidebar.number_input("Daily Rate (e.g., 800)", min_value=100, max_value=2000, value=800)
 performance_rating = st.sidebar.slider("Performance Rating (1-4)", 1, 4, 3)
 years_in_current_role = st.sidebar.slider("Years in Current Role", 0, 20, 5)
-monthly_rate = st.sidebar.number_input("Monthly Rate (e.g., 15000)", min_value=5000, max_value=50000, value=15000)
 training_times_last_year = st.sidebar.slider("Training Times Last Year", 0, 10, 3)
 business_travel = st.sidebar.selectbox("Business Travel", ["Travel_Rarely", "Travel_Frequently", "Non-Travel"])
 distance_from_home = st.sidebar.number_input("Distance from Home (e.g., 10)", min_value=0, max_value=50, value=10)
@@ -57,7 +71,7 @@ job_role_mapping = {"Sales Executive": 0, "Manager": 1, "Research Scientist": 2,
 
 input_data = pd.DataFrame({
     "Age": [int(age)],
-    "MonthlyIncome": [int(str(monthly_income).replace(",", "").strip())],
+    "MonthlyIncome": [monthly_income],
     "OverTime": [1 if overtime == "Yes" else 0],
     "EnvironmentSatisfaction": [int(environment_satisfaction)],
     "RelationshipSatisfaction": [int(relationship_satisfaction)],
@@ -72,7 +86,7 @@ input_data = pd.DataFrame({
     "DailyRate": [float(daily_rate)],
     "PerformanceRating": [int(performance_rating)],
     "YearsInCurrentRole": [int(years_in_current_role)],
-    "MonthlyRate": [float(monthly_rate)],
+    "MonthlyRate": [monthly_rate],  # Fixed for commas
     "TrainingTimesLastYear": [int(training_times_last_year)],
     "BusinessTravel": [business_travel_mapping[business_travel]],
     "DistanceFromHome": [float(distance_from_home)],
