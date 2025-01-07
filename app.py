@@ -6,7 +6,7 @@ from tensorflow.keras.models import load_model
 
 # Load models
 xgb_model = joblib.load("hybrid_model.pkl")  # Hybrid NN-XGBoost Model
-nn_model = load_model("nn_model.keras")  # Neural Network
+nn_model = load_model("nn_model.keras")  # Neural Network Model
 
 # Title
 st.title("Employee Attrition Prediction")
@@ -34,11 +34,11 @@ input_data = pd.DataFrame({
     "JobInvolvement": [job_involvement],
 })
 
-# Convert input to match the expected shape for Neural Network
-input_array = np.array(input_data).reshape(1, -1)  # Reshape to (1, number_of_features)
+# Ensure input matches model expectations
+input_array = input_data.values  # Convert to NumPy array
 
 # Neural Network predictions
-nn_predictions = nn_model.predict(input_array).flatten()
+nn_predictions = nn_model.predict(input_array, verbose=0).flatten()
 
 # Combine NN predictions with input data for Hybrid Model
 hybrid_input = np.column_stack((input_array, nn_predictions))
@@ -51,4 +51,3 @@ if prediction[0] == 1:
     st.success("The employee is likely to leave.")
 else:
     st.success("The employee is likely to stay.")
-
