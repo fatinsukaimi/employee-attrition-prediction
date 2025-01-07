@@ -107,7 +107,33 @@ if monthly_income is not None and monthly_rate is not None:
     })
 
     try:
-        st.write("Debug: Input Data")
+        # Debug preprocessor details and expected columns
+        st.write("Preprocessor Details:")
+        st.write(preprocessor)
+
+        try:
+            expected_columns = preprocessor.feature_names_in_  # For sklearn < 1.0
+        except AttributeError:
+            expected_columns = preprocessor.get_feature_names_out()  # For sklearn >= 1.0
+
+        st.write("Preprocessor Expected Columns:")
+        st.write(expected_columns)
+        st.write("Input Data Columns:")
+        st.write(input_data.columns)
+        st.write("Input Data Types:")
+        st.write(input_data.dtypes)
+
+        # Align input data with expected columns
+        input_data = input_data[expected_columns]
+
+        # Handle missing or invalid values
+        input_data.fillna(0, inplace=True)  # Replace NaNs with 0
+
+        # Force all columns to numeric types
+        input_data = input_data.astype('float64')
+
+        # Debug sanitized input data
+        st.write("Sanitized Input Data:")
         st.write(input_data)
 
         # Preprocess input data
