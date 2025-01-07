@@ -47,9 +47,6 @@ gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
 education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3)
 
-# Whether input (if applicable)
-whether = st.sidebar.selectbox("Whether (Yes/No)", ["Yes", "No"])
-
 # Convert input into DataFrame
 input_data = pd.DataFrame({
     "Age": [int(age)],
@@ -82,7 +79,6 @@ input_data = pd.DataFrame({
     "Gender": [gender],
     "Department": [department],
     "Education": [int(education)],
-    "Whether": [1 if whether == "Yes" else 0],
 })
 
 # Check for missing or invalid values
@@ -90,6 +86,7 @@ if input_data.isnull().values.any():
     st.error("Error: Some input values are missing. Please ensure all inputs are filled.")
 else:
     try:
+        # Preprocess input data
         input_array = preprocessor.transform(input_data)
 
         # Predict using Neural Network
@@ -103,10 +100,8 @@ else:
 
         # Display predictions
         st.subheader("Prediction Results")
-        if hybrid_predictions[0] == 1:
-            st.write("The employee is likely to leave the company.")
-        else:
-            st.write("The employee is likely to stay in the company.")
+        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+        st.write(f"Will the employee leave? **{prediction}**")
 
     except Exception as e:
         st.error(f"Error during preprocessing: {e}")
