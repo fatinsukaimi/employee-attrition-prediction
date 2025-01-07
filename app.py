@@ -4,9 +4,10 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 
-# Load models
+# Load models and preprocessor
 xgb_model = joblib.load("hybrid_model.pkl")  # Hybrid NN-XGBoost
 nn_model = load_model("nn_model.keras")  # Neural Network
+preprocessor = joblib.load("preprocessor.pkl")  # Preprocessor used during training
 
 # Title
 st.title("Employee Attrition Prediction")
@@ -34,16 +35,16 @@ input_data = pd.DataFrame({
     "JobInvolvement": [job_involvement],
 })
 
-# Preprocess input (if necessary, you can add preprocessing steps here)
-input_array = input_data.values.reshape(1, -1)  # Reshape for single sample
+# Preprocess input using the preprocessor
+input_preprocessed = preprocessor.transform(input_data)  # Apply the same preprocessing as during training
 
 # Predictions
 try:
     # Neural Network predictions
-    nn_predictions = nn_model.predict(input_array, verbose=0).flatten()
+    nn_predictions = nn_model.predict(input_preprocessed, verbose=0).flatten()
 
     # Combine NN predictions with input data for Hybrid Model
-    hybrid_input = np.column_stack((input_array, nn_predictions))
+    hybrid_input = np.column_stack((input_preprocessed, nn_predictions))
 
     # Make final prediction using Hybrid Model
     prediction = xgb_model.predict(hybrid_input)
