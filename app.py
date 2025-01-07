@@ -103,6 +103,13 @@ input_data = pd.DataFrame({
 # Process and Predict Button
 if st.button("Predict"):
     try:
+        # Ensure numeric and categorical types
+        numeric_columns = preprocessor.transformers[0][2]
+        input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
+
+        categorical_columns = preprocessor.transformers[1][2]
+        input_data[categorical_columns] = input_data[categorical_columns].astype(str)
+
         # Preprocess
         input_array = preprocessor.transform(input_data)
 
@@ -112,18 +119,13 @@ if st.button("Predict"):
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
-        # Predict probabilities using Hybrid NN-XGBoost
-        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]
+        # Predict using Hybrid NN-XGBoost
+        hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-        # Add a slider to adjust the decision threshold
-        threshold = st.slider("Adjust Decision Threshold", 0.0, 1.0, 0.5, 0.05)
-
-        # Make prediction based on threshold
-        prediction = "Yes" if hybrid_probabilities[0] > threshold else "No"
-        st.subheader(f"Prediction Result (Threshold={threshold}): **{prediction}**")
-
-        # Show probability
-        st.write(f"Probability of 'Yes': {hybrid_probabilities[0]:.2f}")
+        # Display predictions
+        st.subheader("Prediction Results")
+        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+        st.write(f"Will the employee leave? **{prediction}**")
 
     except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        st.error(f"Error during processing: {e}")
