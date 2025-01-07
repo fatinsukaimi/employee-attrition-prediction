@@ -100,32 +100,51 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
-# Process and Predict Button
+# Predict Button
 if st.button("Predict"):
     try:
-        # Ensure numeric and categorical types
-        numeric_columns = preprocessor.transformers[0][2]
-        input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
+        # Debugging input data
+        st.write("Input Data (Before Preprocessing):")
+        st.write(input_data)
+        st.write("Input Data Types:")
+        st.write(input_data.dtypes)
 
-        categorical_columns = preprocessor.transformers[1][2]
+        # Ensure correct data types
+        numeric_columns = ["Age", "MonthlyIncome", "MonthlyRate", "PercentSalaryHike", "YearsWithCurrManager", 
+                           "JobInvolvement", "YearsAtCompany", "JobSatisfaction", "StockOptionLevel", 
+                           "HourlyRate", "DailyRate", "PerformanceRating", "YearsInCurrentRole", 
+                           "TrainingTimesLastYear", "DistanceFromHome", "YearsSinceLastPromotion", 
+                           "TotalWorkingYears", "NumCompaniesWorked"]
+
+        categorical_columns = ["OverTime", "BusinessTravel", "EducationField", "MaritalStatus", "Gender", 
+                               "Department", "JobRole"]
+
+        input_data[numeric_columns] = input_data[numeric_columns].astype("float64")
         input_data[categorical_columns] = input_data[categorical_columns].astype(str)
 
-        # Preprocess
+        # Preprocess input data
         input_array = preprocessor.transform(input_data)
+        st.write("Preprocessed Input Array:")
+        st.write(input_array)
 
-        # Predict using Neural Network
+        # Neural Network Predictions
         nn_predictions = nn_model.predict(input_array).flatten()
 
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
-        # Predict using Hybrid NN-XGBoost
-        hybrid_predictions = hybrid_model.predict(input_hybrid)
+        # Hybrid Model Predictions
+        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]
 
-        # Display predictions
-        st.subheader("Prediction Results")
-        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-        st.write(f"Will the employee leave? **{prediction}**")
+        # Add a slider to adjust the decision threshold
+        threshold = st.slider("Adjust Decision Threshold", 0.0, 1.0, 0.5, 0.05)
+
+        # Make prediction based on threshold
+        prediction = "Yes" if hybrid_probabilities[0] > threshold else "No"
+        st.subheader(f"Prediction Result (Threshold={threshold}): **{prediction}**")
+
+        # Show probability
+        st.write(f"Probability of 'Yes': {hybrid_probabilities[0]:.2f}")
 
     except Exception as e:
-        st.error(f"Error during processing: {e}")
+        st.error(f"Error during prediction: {e}")
