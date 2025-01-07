@@ -17,7 +17,7 @@ st.sidebar.header("Employee Features")
 
 # User Inputs
 age = st.sidebar.slider("Age", 18, 65, 30)
-monthly_income = st.sidebar.number_input("Monthly Income (e.g., 5000)", min_value=1000, step=500)
+monthly_income = st.sidebar.number_input("Monthly Income (e.g., 5000)", min_value=1000, step=500, value=1000)
 overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
@@ -49,38 +49,38 @@ gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
 education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3)
 
-# Convert input into DataFrame
+# Convert input into DataFrame with explicit type casting
 input_data = pd.DataFrame({
-    "Age": [age],
-    "MonthlyIncome": [monthly_income],
+    "Age": [int(age)],
+    "MonthlyIncome": [float(monthly_income)],
     "OverTime": [1 if overtime == "Yes" else 0],
-    "EnvironmentSatisfaction": [environment_satisfaction],
-    "RelationshipSatisfaction": [relationship_satisfaction],
-    "PercentSalaryHike": [percent_salary_hike],
-    "YearsWithCurrManager": [years_with_curr_manager],
-    "JobInvolvement": [job_involvement],
-    "YearsAtCompany": [years_at_company],
-    "JobSatisfaction": [job_satisfaction],
+    "EnvironmentSatisfaction": [int(environment_satisfaction)],
+    "RelationshipSatisfaction": [int(relationship_satisfaction)],
+    "PercentSalaryHike": [float(percent_salary_hike)],
+    "YearsWithCurrManager": [int(years_with_curr_manager)],
+    "JobInvolvement": [int(job_involvement)],
+    "YearsAtCompany": [int(years_at_company)],
+    "JobSatisfaction": [int(job_satisfaction)],
     "MaritalStatus": [marital_status],
-    "StockOptionLevel": [stock_option_level],
-    "HourlyRate": [hourly_rate],
-    "DailyRate": [daily_rate],
-    "PerformanceRating": [performance_rating],
-    "YearsInCurrentRole": [years_in_current_role],
-    "MonthlyRate": [monthly_rate],
-    "TrainingTimesLastYear": [training_times_last_year],
+    "StockOptionLevel": [int(stock_option_level)],
+    "HourlyRate": [float(hourly_rate)],
+    "DailyRate": [float(daily_rate)],
+    "PerformanceRating": [int(performance_rating)],
+    "YearsInCurrentRole": [int(years_in_current_role)],
+    "MonthlyRate": [float(monthly_rate)],
+    "TrainingTimesLastYear": [int(training_times_last_year)],
     "BusinessTravel": [business_travel],
-    "DistanceFromHome": [distance_from_home],
+    "DistanceFromHome": [float(distance_from_home)],
     "EducationField": [education_field],
-    "YearsSinceLastPromotion": [years_since_last_promotion],
-    "TotalWorkingYears": [total_working_years],
-    "NumCompaniesWorked": [num_companies_worked],
+    "YearsSinceLastPromotion": [int(years_since_last_promotion)],
+    "TotalWorkingYears": [int(total_working_years)],
+    "NumCompaniesWorked": [int(num_companies_worked)],
     "JobRole": [job_role],
-    "JobLevel": [job_level],
-    "WorkLifeBalance": [work_life_balance],
+    "JobLevel": [int(job_level)],
+    "WorkLifeBalance": [int(work_life_balance)],
     "Gender": [gender],
     "Department": [department],
-    "Education": [education],
+    "Education": [int(education)],
 })
 
 # Preprocess input data
