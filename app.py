@@ -4,10 +4,23 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 
+# Cache the model to load it only once per session
+@st.cache_resource
+def load_nn_model():
+    return load_model("nn_model.keras")
+
+@st.cache_resource
+def load_hybrid_model():
+    return joblib.load("hybrid_model.pkl")
+
+@st.cache_resource
+def load_preprocessor():
+    return joblib.load("preprocessor.pkl")
+
 # Load models and preprocessor
-nn_model = load_model("nn_model.keras")
-hybrid_model = joblib.load("hybrid_model.pkl")
-preprocessor = joblib.load("preprocessor.pkl")
+nn_model = load_nn_model()
+hybrid_model = load_hybrid_model()
+preprocessor = load_preprocessor()
 
 # Title
 st.title("Employee Attrition Prediction")
@@ -28,8 +41,16 @@ def clean_and_convert_input(input_value):
 age = st.sidebar.slider("Age", 18, 65, 30)
 monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
 monthly_income = clean_and_convert_input(monthly_income_input)
+if monthly_income is None or monthly_income <= 0:
+    st.error("Please enter a valid Monthly Income greater than 0.")
+    st.stop()
+
 monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000")
 monthly_rate = clean_and_convert_input(monthly_rate_input)
+if monthly_rate is None or monthly_rate <= 0:
+    st.error("Please enter a valid Monthly Rate greater than 0.")
+    st.stop()
+
 overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
@@ -100,32 +121,28 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
-# Process and Predict Button
+# Predict Button
 if st.button("Predict"):
     try:
-        # Ensure numeric and categorical types
-        numeric_columns = preprocessor.transformers[0][2]
-        input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
-
-        categorical_columns = preprocessor.transformers[1][2]
-        input_data[categorical_columns] = input_data[categorical_columns].astype(str)
-
-        # Preprocess
+        # Preprocess input data
         input_array = preprocessor.transform(input_data)
 
-        # Predict using Neural Network
+        # Neural Network Probabilities
         nn_predictions = nn_model.predict(input_array).flatten()
 
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
-        # Predict using Hybrid NN-XGBoost
-        hybrid_predictions = hybrid_model.predict(input_hybrid)
+        # Hybrid Model Probabilities
+        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]  # Probability of "Yes"
+        st.write(f"Prediction Probability (Yes): {hybrid_probabilities[0]:.2f}")
 
-        # Display predictions
-        st.subheader("Prediction Results")
-        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-        st.write(f"Will the employee leave? **{prediction}**")
+        # Add a slider to adjust the decision threshold
+        threshold = st.slider("Adjust Decision Threshold", 0.0, 1.0, 0.5, 0.05)
+
+        # Adjust prediction based on the threshold
+        prediction = "Yes" if hybrid_probabilities[0] > threshold else "No"
+        st.subheader(f"Prediction Result (Threshold={threshold}): **{prediction}**")
 
     except Exception as e:
-        st.error(f"Error during processing: {e}")
+        st.error(f"Error during prediction: {e}")
