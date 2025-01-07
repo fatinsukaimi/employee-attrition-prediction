@@ -14,10 +14,8 @@ st.title("Employee Attrition Prediction")
 
 # Sidebar Inputs
 st.sidebar.header("Employee Features")
-
-# User Inputs
 age = st.sidebar.slider("Age", 18, 65, 30)
-monthly_income = st.sidebar.number_input("Monthly Income (e.g., 5000)", min_value=1000, step=500, value=1000)
+monthly_income = st.sidebar.number_input("Monthly Income (e.g., 5000)", min_value=1000, step=500)
 overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
@@ -49,7 +47,7 @@ gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
 education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3)
 
-# Convert input into DataFrame with explicit type casting
+# Convert input into DataFrame
 input_data = pd.DataFrame({
     "Age": [int(age)],
     "MonthlyIncome": [float(monthly_income)],
@@ -82,6 +80,12 @@ input_data = pd.DataFrame({
     "Department": [department],
     "Education": [int(education)],
 })
+
+# Debugging: Show input data and its types
+st.write("Input Data for Preprocessing:")
+st.write(input_data)
+st.write("Data Types:")
+st.write(input_data.dtypes)
 
 # Preprocess input data
 try:
