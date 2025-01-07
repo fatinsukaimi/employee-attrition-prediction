@@ -14,22 +14,25 @@ st.title("Employee Attrition Prediction")
 
 # Sidebar Inputs
 st.sidebar.header("Employee Features")
-age = st.sidebar.slider("Age", 18, 65, 30)
 
-# Helper function to clean numeric input with commas
-def clean_numeric_input(input_value):
+# Helper function to clean and convert numeric inputs
+def clean_and_convert_input(input_value):
     try:
-        return float(str(input_value).replace(",", "").strip())
+        # Remove commas and spaces, and convert to float
+        cleaned_value = input_value.replace(',', '').replace(' ', '')
+        return float(cleaned_value)
     except ValueError:
         st.error(f"Invalid input: {input_value}. Please enter a valid number.")
         return None
 
 # Inputs
+age = st.sidebar.slider("Age", 18, 65, 30)
+
 monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="1000")
-monthly_income = clean_numeric_input(monthly_income_input)
+monthly_income = clean_and_convert_input(monthly_income_input)
 
 monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000")
-monthly_rate = clean_numeric_input(monthly_rate_input)
+monthly_rate = clean_and_convert_input(monthly_rate_input)
 
 overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
@@ -69,7 +72,6 @@ department_mapping = {"Sales": 0, "Research & Development": 1, "Human Resources"
 education_field_mapping = {"Life Sciences": 0, "Medical": 1, "Marketing": 2, "Technical Degree": 3, "Other": 4}
 job_role_mapping = {"Sales Executive": 0, "Manager": 1, "Research Scientist": 2, "Laboratory Technician": 3, "Other": 4}
 
-# Build the input DataFrame
 if monthly_income is not None and monthly_rate is not None:
     input_data = pd.DataFrame({
         "Age": [int(age)],
@@ -104,39 +106,26 @@ if monthly_income is not None and monthly_rate is not None:
         "Education": [int(education)],
     })
 
-try:
-    # Debug preprocessor expectations
-    st.write("Preprocessor Expected Feature Names:")
     try:
-        expected_columns = preprocessor.feature_names_in_  # For sklearn < 1.0
-    except AttributeError:
-        expected_columns = preprocessor.get_feature_names_out()  # For sklearn >= 1.0
-    st.write(expected_columns)
+        st.write("Debug: Input Data")
+        st.write(input_data)
 
-    # Align input_data columns to match preprocessor expectations
-    input_data = input_data[expected_columns]
+        # Preprocess input data
+        input_array = preprocessor.transform(input_data)
 
-    # Debug aligned input data
-    st.write("Aligned Input Data:")
-    st.write(input_data)
+        # Predict using Neural Network
+        nn_predictions = nn_model.predict(input_array).flatten()
 
-    # Preprocess input data
-    input_array = preprocessor.transform(input_data)
+        # Create hybrid features
+        input_hybrid = np.column_stack((input_array, nn_predictions))
 
-    # Predict using Neural Network
-    nn_predictions = nn_model.predict(input_array).flatten()
+        # Predict using Hybrid NN-XGBoost
+        hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-    # Create hybrid features
-    input_hybrid = np.column_stack((input_array, nn_predictions))
+        # Display predictions
+        st.subheader("Prediction Results")
+        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+        st.write(f"Will the employee leave? **{prediction}**")
 
-    # Predict using Hybrid NN-XGBoost
-    hybrid_predictions = hybrid_model.predict(input_hybrid)
-
-    # Display predictions
-    st.subheader("Prediction Results")
-    prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-    st.write(f"Will the employee leave? **{prediction}**")
-
-except Exception as e:
-    st.error(f"Error during preprocessing: {e}")
-
+    except Exception as e:
+        st.error(f"Error during preprocessing: {e}")
