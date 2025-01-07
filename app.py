@@ -26,7 +26,7 @@ def clean_and_convert_input(input_value):
 
 # Inputs
 age = st.sidebar.slider("Age", 18, 65, 30)
-monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="1000")
+monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
 monthly_income = clean_and_convert_input(monthly_income_input)
 monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000")
 monthly_rate = clean_and_convert_input(monthly_rate_input)
@@ -66,58 +66,69 @@ department_mapping = {"Sales": 0, "Research & Development": 1, "Human Resources"
 education_field_mapping = {"Life Sciences": 0, "Medical": 1, "Marketing": 2, "Technical Degree": 3, "Other": 4}
 job_role_mapping = {"Sales Executive": 0, "Manager": 1, "Research Scientist": 2, "Laboratory Technician": 3, "Other": 4}
 
+# Define numeric and categorical columns based on the preprocessor details
+numeric_columns = [
+    'Age', 'DailyRate', 'DistanceFromHome', 'Education',
+    'EnvironmentSatisfaction', 'HourlyRate', 'JobInvolvement', 'JobLevel',
+    'JobSatisfaction', 'MonthlyIncome', 'MonthlyRate', 'NumCompaniesWorked',
+    'PercentSalaryHike', 'PerformanceRating', 'RelationshipSatisfaction',
+    'StockOptionLevel', 'TotalWorkingYears', 'TrainingTimesLastYear',
+    'WorkLifeBalance', 'YearsAtCompany', 'YearsInCurrentRole',
+    'YearsSinceLastPromotion', 'YearsWithCurrManager'
+]
+
+categorical_columns = [
+    'BusinessTravel', 'Department', 'EducationField', 'Gender',
+    'JobRole', 'MaritalStatus', 'OverTime'
+]
+
 # Prepare input data
 input_data = pd.DataFrame({
-    "Age": [int(age)],
+    "Age": [age],
     "MonthlyIncome": [monthly_income],
     "MonthlyRate": [monthly_rate],
     "OverTime": [1 if overtime == "Yes" else 0],
-    "EnvironmentSatisfaction": [int(environment_satisfaction)],
-    "RelationshipSatisfaction": [int(relationship_satisfaction)],
+    "EnvironmentSatisfaction": [environment_satisfaction],
+    "RelationshipSatisfaction": [relationship_satisfaction],
     "PercentSalaryHike": [percent_salary_hike],
-    "YearsWithCurrManager": [int(years_with_curr_manager)],
-    "JobInvolvement": [int(job_involvement)],
-    "YearsAtCompany": [int(years_at_company)],
-    "JobSatisfaction": [int(job_satisfaction)],
+    "YearsWithCurrManager": [years_with_curr_manager],
+    "JobInvolvement": [job_involvement],
+    "YearsAtCompany": [years_at_company],
+    "JobSatisfaction": [job_satisfaction],
     "MaritalStatus": [marital_status_mapping[marital_status]],
-    "StockOptionLevel": [int(stock_option_level)],
-    "HourlyRate": [float(hourly_rate)],
-    "DailyRate": [float(daily_rate)],
-    "PerformanceRating": [int(performance_rating)],
-    "YearsInCurrentRole": [int(years_in_current_role)],
-    "TrainingTimesLastYear": [int(training_times_last_year)],
+    "StockOptionLevel": [stock_option_level],
+    "HourlyRate": [hourly_rate],
+    "DailyRate": [daily_rate],
+    "PerformanceRating": [performance_rating],
+    "YearsInCurrentRole": [years_in_current_role],
+    "TrainingTimesLastYear": [training_times_last_year],
     "BusinessTravel": [business_travel_mapping[business_travel]],
-    "DistanceFromHome": [float(distance_from_home)],
+    "DistanceFromHome": [distance_from_home],
     "EducationField": [education_field_mapping[education_field]],
-    "YearsSinceLastPromotion": [int(years_since_last_promotion)],
-    "TotalWorkingYears": [int(total_working_years)],
-    "NumCompaniesWorked": [int(num_companies_worked)],
+    "YearsSinceLastPromotion": [years_since_last_promotion],
+    "TotalWorkingYears": [total_working_years],
+    "NumCompaniesWorked": [num_companies_worked],
     "JobRole": [job_role_mapping[job_role]],
-    "JobLevel": [int(job_level)],
-    "WorkLifeBalance": [int(work_life_balance)],
+    "JobLevel": [job_level],
+    "WorkLifeBalance": [work_life_balance],
     "Gender": [gender_mapping[gender]],
     "Department": [department_mapping[department]],
-    "Education": [int(education)],
+    "Education": [education],
 })
 
-# Ensure columns match preprocessor expectations
-expected_columns = list(preprocessor.transformers[0][2]) + list(preprocessor.transformers[1][2])
-missing_cols = [col for col in expected_columns if col not in input_data.columns]
-for col in missing_cols:
-    if col in preprocessor.transformers[0][2]:  # Numeric
+# Align and sanitize input data
+for col in numeric_columns:
+    if col not in input_data.columns:
         input_data[col] = 0
-    else:  # Categorical
+
+for col in categorical_columns:
+    if col not in input_data.columns:
         input_data[col] = "Unknown"
 
-# Align column order
-input_data = input_data[expected_columns]
-
-# Ensure numeric and categorical types
 input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
-input_data[categorical_columns] = input_data[categorical_columns].astype('object')
 
-# Debug final input data
-st.write("Final Input Data for Preprocessing:")
+# Debug input data
+st.write("Final Input Data:")
 st.write(input_data)
 
 try:
