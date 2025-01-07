@@ -15,8 +15,13 @@ st.title("Employee Attrition Prediction")
 # Sidebar Inputs
 st.sidebar.header("Employee Features")
 
-# Initialize session state for resetting prediction
+# Add Reset Prediction button at the top
 if "reset_prediction" not in st.session_state:
+    st.session_state.reset_prediction = False
+
+if st.sidebar.button("Reset Prediction"):
+    st.session_state.reset_prediction = True
+else:
     st.session_state.reset_prediction = False
 
 # Helper function to clean and convert numeric inputs
@@ -103,12 +108,6 @@ input_data = pd.DataFrame({
     "Department": [department_mapping[department]],
     "Education": [education],
 })
-
-# Reset Prediction Result
-if st.sidebar.button("Reset Prediction"):
-    st.session_state.reset_prediction = True
-else:
-    st.session_state.reset_prediction = False
 
 # Process and Predict Button
 if st.button("Predict"):
