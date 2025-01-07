@@ -24,6 +24,7 @@ relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)",
 percent_salary_hike = st.sidebar.slider("Percent Salary Hike (%)", 0, 50, 10)
 years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
 job_involvement = st.sidebar.slider("Job Involvement (1-4)", 1, 4, 3)
+years_at_company = st.sidebar.slider("Years at Company", 0, 40, 5)
 
 # Additional inputs for missing columns
 job_satisfaction = st.sidebar.slider("Job Satisfaction (1-4)", 1, 4, 3)
@@ -58,6 +59,7 @@ input_data = pd.DataFrame({
     "PercentSalaryHike": [percent_salary_hike],
     "YearsWithCurrManager": [years_with_curr_manager],
     "JobInvolvement": [job_involvement],
+    "YearsAtCompany": [years_at_company],
     "JobSatisfaction": [job_satisfaction],
     "MaritalStatus": [marital_status],
     "StockOptionLevel": [stock_option_level],
