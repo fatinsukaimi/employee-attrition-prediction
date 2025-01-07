@@ -5,8 +5,8 @@ import joblib
 from tensorflow.keras.models import load_model
 
 # Load models
-xgb_model = joblib.load("hybrid_nn_xgboost_model.pkl")  # Hybrid NN-XGBoost Model
-nn_model = load_model("nn_model.h5")  # Neural Network
+xgb_model = joblib.load("hybrid_model.pkl")  # Hybrid NN-XGBoost Model
+nn_model = load_model("nn_model.keras")  # Neural Network
 
 # Title
 st.title("Employee Attrition Prediction")
