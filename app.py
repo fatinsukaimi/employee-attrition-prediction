@@ -24,39 +24,48 @@ def clean_and_convert_input(input_value):
         st.error(f"Invalid input: {input_value}. Please enter a valid number.")
         return None
 
-# Inputs
-age = st.sidebar.slider("Age", 18, 65, 30)
-monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
+# Function to reset the session state
+def reset_fields():
+    for key in st.session_state.keys():
+        del st.session_state[key]
+
+# Add a reset button to the sidebar
+if st.sidebar.button("Reset Inputs"):
+    reset_fields()
+
+# Inputs with session state management
+age = st.sidebar.slider("Age", 18, 65, 30, key="age")
+monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000", key="monthly_income")
 monthly_income = clean_and_convert_input(monthly_income_input)
-monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000")
+monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000", key="monthly_rate")
 monthly_rate = clean_and_convert_input(monthly_rate_input)
-overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
-environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
-relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-percent_salary_hike = st.sidebar.slider("Percent Salary Hike (%)", 0, 50, 10)
-years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
-job_involvement = st.sidebar.slider("Job Involvement (1-4)", 1, 4, 3)
-years_at_company = st.sidebar.slider("Years at Company", 0, 40, 5)
-job_satisfaction = st.sidebar.slider("Job Satisfaction (1-4)", 1, 4, 3)
-marital_status = st.sidebar.selectbox("Marital Status", ["Single", "Married", "Divorced"])
-stock_option_level = st.sidebar.slider("Stock Option Level (0-3)", 0, 3, 0)
-hourly_rate = st.sidebar.number_input("Hourly Rate (e.g., 40)", min_value=10, max_value=100, value=40)
-daily_rate = st.sidebar.number_input("Daily Rate (e.g., 800)", min_value=100, max_value=2000, value=800)
-performance_rating = st.sidebar.slider("Performance Rating (1-4)", 1, 4, 3)
-years_in_current_role = st.sidebar.slider("Years in Current Role", 0, 20, 5)
-training_times_last_year = st.sidebar.slider("Training Times Last Year", 0, 10, 3)
-business_travel = st.sidebar.selectbox("Business Travel", ["Travel_Rarely", "Travel_Frequently", "Non-Travel"])
-distance_from_home = st.sidebar.number_input("Distance from Home (e.g., 10)", min_value=0, max_value=50, value=10)
-education_field = st.sidebar.selectbox("Education Field", ["Life Sciences", "Medical", "Marketing", "Technical Degree", "Other"])
-years_since_last_promotion = st.sidebar.slider("Years Since Last Promotion", 0, 20, 1)
-total_working_years = st.sidebar.slider("Total Working Years", 0, 40, 10)
-num_companies_worked = st.sidebar.slider("Number of Companies Worked", 0, 20, 2)
-job_role = st.sidebar.selectbox("Job Role", ["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"])
-job_level = st.sidebar.slider("Job Level (1-5)", 1, 5, 2)
-work_life_balance = st.sidebar.slider("Work-Life Balance (1-4)", 1, 4, 3)
-gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
-department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"])
-education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3)
+overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"], key="overtime")
+environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3, key="environment_satisfaction")
+relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3, key="relationship_satisfaction")
+percent_salary_hike = st.sidebar.slider("Percent Salary Hike (%)", 0, 50, 10, key="percent_salary_hike")
+years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5, key="years_with_curr_manager")
+job_involvement = st.sidebar.slider("Job Involvement (1-4)", 1, 4, 3, key="job_involvement")
+years_at_company = st.sidebar.slider("Years at Company", 0, 40, 5, key="years_at_company")
+job_satisfaction = st.sidebar.slider("Job Satisfaction (1-4)", 1, 4, 3, key="job_satisfaction")
+marital_status = st.sidebar.selectbox("Marital Status", ["Single", "Married", "Divorced"], key="marital_status")
+stock_option_level = st.sidebar.slider("Stock Option Level (0-3)", 0, 3, 0, key="stock_option_level")
+hourly_rate = st.sidebar.number_input("Hourly Rate (e.g., 40)", min_value=10, max_value=100, value=40, key="hourly_rate")
+daily_rate = st.sidebar.number_input("Daily Rate (e.g., 800)", min_value=100, max_value=2000, value=800, key="daily_rate")
+performance_rating = st.sidebar.slider("Performance Rating (1-4)", 1, 4, 3, key="performance_rating")
+years_in_current_role = st.sidebar.slider("Years in Current Role", 0, 20, 5, key="years_in_current_role")
+training_times_last_year = st.sidebar.slider("Training Times Last Year", 0, 10, 3, key="training_times_last_year")
+business_travel = st.sidebar.selectbox("Business Travel", ["Travel_Rarely", "Travel_Frequently", "Non-Travel"], key="business_travel")
+distance_from_home = st.sidebar.number_input("Distance from Home (e.g., 10)", min_value=0, max_value=50, value=10, key="distance_from_home")
+education_field = st.sidebar.selectbox("Education Field", ["Life Sciences", "Medical", "Marketing", "Technical Degree", "Other"], key="education_field")
+years_since_last_promotion = st.sidebar.slider("Years Since Last Promotion", 0, 20, 1, key="years_since_last_promotion")
+total_working_years = st.sidebar.slider("Total Working Years", 0, 40, 10, key="total_working_years")
+num_companies_worked = st.sidebar.slider("Number of Companies Worked", 0, 20, 2, key="num_companies_worked")
+job_role = st.sidebar.selectbox("Job Role", ["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"], key="job_role")
+job_level = st.sidebar.slider("Job Level (1-5)", 1, 5, 2, key="job_level")
+work_life_balance = st.sidebar.slider("Work-Life Balance (1-4)", 1, 4, 3, key="work_life_balance")
+gender = st.sidebar.selectbox("Gender", ["Male", "Female"], key="gender")
+department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"], key="department")
+education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3, key="education")
 
 # Encode categorical variables
 marital_status_mapping = {"Single": 0, "Married": 1, "Divorced": 2}
@@ -100,46 +109,32 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
-# Predict Button
+# Process and Predict Button
 if st.button("Predict"):
     try:
-        # Debugging input data
-        st.write("Input Data (Before Preprocessing):")
-        st.write(input_data)
-        st.write("Input Data Types:")
-        st.write(input_data.dtypes)
-
-        # Ensure correct data types
+        # Ensure numeric and categorical types
         numeric_columns = preprocessor.transformers[0][2]
-        input_data[numeric_columns] = input_data[numeric_columns].astype("float64")
+        input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
 
         categorical_columns = preprocessor.transformers[1][2]
         input_data[categorical_columns] = input_data[categorical_columns].astype(str)
 
-        # Preprocess input data
+        # Preprocess
         input_array = preprocessor.transform(input_data)
-        st.write("Preprocessed Input Array Shape:", input_array.shape)
 
         # Predict using Neural Network
         nn_predictions = nn_model.predict(input_array).flatten()
-        st.write("Neural Network Predictions (Raw):", nn_predictions)
 
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
-        # Hybrid Model Predictions
-        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)[:, 1]
-        st.write("Hybrid Model Probabilities (Yes):", hybrid_probabilities)
+        # Predict using Hybrid NN-XGBoost
+        hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-        # Add a slider to adjust the decision threshold
-        threshold = st.slider("Adjust Decision Threshold", 0.0, 1.0, 0.5, 0.05)
-
-        # Make prediction based on threshold
-        prediction = "Yes" if hybrid_probabilities[0] > threshold else "No"
-        st.subheader(f"Prediction Result (Threshold={threshold}): **{prediction}**")
-
-        # Show probability
-        st.write(f"Probability of 'Yes': {hybrid_probabilities[0]:.2f}")
+        # Display predictions
+        st.subheader("Prediction Results")
+        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+        st.write(f"Will the employee leave? **{prediction}**")
 
     except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        st.error(f"Error during processing: {e}")
