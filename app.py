@@ -7,8 +7,8 @@ import shap
 
 # Load the preprocessor and models
 preprocessor = joblib.load('preprocessor.pkl')
-hybrid_model = joblib.load('hybrid_nn_xgboost.pkl')
-nn_model = load_model('nn_model.h5')
+hybrid_model = joblib.load('hybrid_model.pkl')
+nn_model = load_model('nn_model.keras')
 
 # Title and Description
 st.title("Employee Attrition Prediction")
