@@ -15,9 +15,9 @@ st.title("Employee Attrition Prediction")
 # Reset function
 def reset_fields():
     st.session_state.clear()
+    st.session_state["age"] = 18
     st.session_state["monthly_income"] = ""
     st.session_state["monthly_rate"] = ""
-    st.session_state["age"] = 18
     st.session_state["overtime"] = "Yes"
     st.session_state["environment_satisfaction"] = 1
     st.session_state["relationship_satisfaction"] = 1
@@ -51,7 +51,7 @@ st.sidebar.header("Employee Features")
 if st.sidebar.button("Reset Inputs"):
     reset_fields()
 
-# Inputs with session state management
+# Inputs
 age = st.sidebar.slider("Age", 18, 65, st.session_state.get("age", 18), key="age")
 monthly_income = st.sidebar.text_input(
     "Monthly Income (e.g., 5000)", value=st.session_state.get("monthly_income", ""), key="monthly_income"
@@ -128,54 +128,29 @@ total_working_years = st.sidebar.slider(
 num_companies_worked = st.sidebar.slider(
     "Number of Companies Worked", 0, 20, st.session_state.get("num_companies_worked", 0), key="num_companies_worked"
 )
-job_role = st.sidebar.selectbox(
-    "Job Role",
-    ["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"],
-    index=["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"].index(st.session_state.get("job_role", "Sales Executive")),
-    key="job_role",
-)
-job_level = st.sidebar.slider(
-    "Job Level (1-5)", 1, 5, st.session_state.get("job_level", 1), key="job_level"
-)
-work_life_balance = st.sidebar.slider(
-    "Work-Life Balance (1-4)", 1, 4, st.session_state.get("work_life_balance", 1), key="work_life_balance"
-)
-gender = st.sidebar.selectbox(
-    "Gender", ["Male", "Female"], index=["Male", "Female"].index(st.session_state.get("gender", "Male")), key="gender"
-)
-department = st.sidebar.selectbox(
-    "Department",
-    ["Sales", "Research & Development", "Human Resources"],
-    index=["Sales", "Research & Development", "Human Resources"].index(st.session_state.get("department", "Sales")),
-    key="department",
-)
-education = st.sidebar.slider(
-    "Education Level (1-5)", 1, 5, st.session_state.get("education", 1), key="education"
-)
 
-# Process and Predict Button
+# Prediction Button
 if st.button("Predict"):
     try:
+        # Collect all inputs into a DataFrame
         input_data = pd.DataFrame({
             "Age": [age],
             "MonthlyIncome": [monthly_income],
             "MonthlyRate": [monthly_rate],
             "OverTime": [1 if overtime == "Yes" else 0],
-            "EnvironmentSatisfaction": [environment_satisfaction],
-            "RelationshipSatisfaction": [relationship_satisfaction],
-            "PercentSalaryHike": [percent_salary_hike],
-            "YearsWithCurrManager": [years_with_curr_manager],
-            # Add other inputs here...
+            # Add all other features here...
         })
 
-        numeric_columns = preprocessor.transformers[0][2]
-        input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
-        input_array = preprocessor.transform(input_data)
+        # Ensure correct types
+        input_data = input_data.astype("float64")
 
-        nn_predictions = nn_model.predict(input_array).flatten()
-        hybrid_predictions = hybrid_model.predict(np.column_stack((input_array, nn_predictions)))
+        # Preprocess and predict
+        processed_input = preprocessor.transform(input_data)
+        nn_prediction = nn_model.predict(processed_input).flatten()
+        hybrid_input = np.column_stack((processed_input, nn_prediction))
+        hybrid_prediction = hybrid_model.predict(hybrid_input)
 
-        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-        st.write(f"Prediction: Will the employee leave? **{prediction}**")
+        # Display the prediction
+        st.write(f"Prediction: {'Yes' if hybrid_prediction[0] == 1 else 'No'}")
     except Exception as e:
         st.error(f"Error: {e}")
