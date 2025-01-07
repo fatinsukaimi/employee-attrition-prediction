@@ -100,33 +100,32 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
-try:
-    # Debugging steps
-    st.write("Debugging Input Data")
-    st.write("Data Types:")
-    st.write(input_data.dtypes)
+# Process and Predict Button
+if st.button("Predict"):
+    try:
+        # Ensure numeric and categorical types
+        numeric_columns = preprocessor.transformers[0][2]
+        input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
 
-    # Align numeric and categorical data
-    numeric_columns = preprocessor.transformers[0][2]
-    input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
+        categorical_columns = preprocessor.transformers[1][2]
+        input_data[categorical_columns] = input_data[categorical_columns].astype(str)
 
-    categorical_columns = preprocessor.transformers[1][2]
-    input_data[categorical_columns] = input_data[categorical_columns].astype(str)
+        # Preprocess
+        input_array = preprocessor.transform(input_data)
 
-    # Fill missing values
-    input_data.fillna(0, inplace=True)
+        # Predict using Neural Network
+        nn_predictions = nn_model.predict(input_array).flatten()
 
-    # Preprocess
-    input_array = preprocessor.transform(input_data)
+        # Create hybrid features
+        input_hybrid = np.column_stack((input_array, nn_predictions))
 
-    # Predict
-    nn_predictions = nn_model.predict(input_array).flatten()
-    hybrid_features = np.column_stack((input_array, nn_predictions))
-    hybrid_predictions = hybrid_model.predict(hybrid_features)
+        # Predict using Hybrid NN-XGBoost
+        hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-    # Display results
-    prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-    st.subheader(f"Will the employee leave? **{prediction}**")
+        # Display predictions
+        st.subheader("Prediction Results")
+        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+        st.write(f"Will the employee leave? **{prediction}**")
 
-except Exception as e:
-    st.error(f"Error during preprocessing: {e}")
+    except Exception as e:
+        st.error(f"Error during processing: {e}")
