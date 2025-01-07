@@ -34,11 +34,14 @@ input_data = pd.DataFrame({
     "JobInvolvement": [job_involvement],
 })
 
+# Convert input to match the expected shape for Neural Network
+input_array = np.array(input_data).reshape(1, -1)  # Reshape to (1, number_of_features)
+
 # Neural Network predictions
-nn_predictions = nn_model.predict(input_data).flatten()
+nn_predictions = nn_model.predict(input_array).flatten()
 
 # Combine NN predictions with input data for Hybrid Model
-hybrid_input = np.column_stack((input_data, nn_predictions))
+hybrid_input = np.column_stack((input_array, nn_predictions))
 
 # Make final prediction using Hybrid Model
 prediction = xgb_model.predict(hybrid_input)
@@ -48,3 +51,4 @@ if prediction[0] == 1:
     st.success("The employee is likely to leave.")
 else:
     st.success("The employee is likely to stay.")
+
