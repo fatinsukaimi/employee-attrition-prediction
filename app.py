@@ -34,38 +34,108 @@ if st.sidebar.button("Reset Inputs"):
     reset_fields()
 
 # Inputs with session state management
-age = st.sidebar.slider("Age", 18, 65, 30, key="age")
-monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000", key="monthly_income")
+age = st.sidebar.slider("Age", 18, 65, st.session_state.get("age", 30), key="age")
+monthly_income_input = st.sidebar.text_input(
+    "Monthly Income (e.g., 5000)", value=st.session_state.get("monthly_income", "5000"), key="monthly_income"
+)
 monthly_income = clean_and_convert_input(monthly_income_input)
-monthly_rate_input = st.sidebar.text_input("Monthly Rate (e.g., 15000)", value="15000", key="monthly_rate")
+monthly_rate_input = st.sidebar.text_input(
+    "Monthly Rate (e.g., 15000)", value=st.session_state.get("monthly_rate", "15000"), key="monthly_rate"
+)
 monthly_rate = clean_and_convert_input(monthly_rate_input)
-overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"], key="overtime")
-environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3, key="environment_satisfaction")
-relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3, key="relationship_satisfaction")
-percent_salary_hike = st.sidebar.slider("Percent Salary Hike (%)", 0, 50, 10, key="percent_salary_hike")
-years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5, key="years_with_curr_manager")
-job_involvement = st.sidebar.slider("Job Involvement (1-4)", 1, 4, 3, key="job_involvement")
-years_at_company = st.sidebar.slider("Years at Company", 0, 40, 5, key="years_at_company")
-job_satisfaction = st.sidebar.slider("Job Satisfaction (1-4)", 1, 4, 3, key="job_satisfaction")
-marital_status = st.sidebar.selectbox("Marital Status", ["Single", "Married", "Divorced"], key="marital_status")
-stock_option_level = st.sidebar.slider("Stock Option Level (0-3)", 0, 3, 0, key="stock_option_level")
-hourly_rate = st.sidebar.number_input("Hourly Rate (e.g., 40)", min_value=10, max_value=100, value=40, key="hourly_rate")
-daily_rate = st.sidebar.number_input("Daily Rate (e.g., 800)", min_value=100, max_value=2000, value=800, key="daily_rate")
-performance_rating = st.sidebar.slider("Performance Rating (1-4)", 1, 4, 3, key="performance_rating")
-years_in_current_role = st.sidebar.slider("Years in Current Role", 0, 20, 5, key="years_in_current_role")
-training_times_last_year = st.sidebar.slider("Training Times Last Year", 0, 10, 3, key="training_times_last_year")
-business_travel = st.sidebar.selectbox("Business Travel", ["Travel_Rarely", "Travel_Frequently", "Non-Travel"], key="business_travel")
-distance_from_home = st.sidebar.number_input("Distance from Home (e.g., 10)", min_value=0, max_value=50, value=10, key="distance_from_home")
-education_field = st.sidebar.selectbox("Education Field", ["Life Sciences", "Medical", "Marketing", "Technical Degree", "Other"], key="education_field")
-years_since_last_promotion = st.sidebar.slider("Years Since Last Promotion", 0, 20, 1, key="years_since_last_promotion")
-total_working_years = st.sidebar.slider("Total Working Years", 0, 40, 10, key="total_working_years")
-num_companies_worked = st.sidebar.slider("Number of Companies Worked", 0, 20, 2, key="num_companies_worked")
-job_role = st.sidebar.selectbox("Job Role", ["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"], key="job_role")
-job_level = st.sidebar.slider("Job Level (1-5)", 1, 5, 2, key="job_level")
-work_life_balance = st.sidebar.slider("Work-Life Balance (1-4)", 1, 4, 3, key="work_life_balance")
-gender = st.sidebar.selectbox("Gender", ["Male", "Female"], key="gender")
-department = st.sidebar.selectbox("Department", ["Sales", "Research & Development", "Human Resources"], key="department")
-education = st.sidebar.slider("Education Level (1-5)", 1, 5, 3, key="education")
+overtime = st.sidebar.selectbox(
+    "OverTime (Yes/No)", ["Yes", "No"], index=["Yes", "No"].index(st.session_state.get("overtime", "Yes")), key="overtime"
+)
+environment_satisfaction = st.sidebar.slider(
+    "Environment Satisfaction (1-4)", 1, 4, st.session_state.get("environment_satisfaction", 3), key="environment_satisfaction"
+)
+relationship_satisfaction = st.sidebar.slider(
+    "Relationship Satisfaction (1-4)", 1, 4, st.session_state.get("relationship_satisfaction", 3), key="relationship_satisfaction"
+)
+percent_salary_hike = st.sidebar.slider(
+    "Percent Salary Hike (%)", 0, 50, st.session_state.get("percent_salary_hike", 10), key="percent_salary_hike"
+)
+years_with_curr_manager = st.sidebar.slider(
+    "Years with Current Manager", 0, 20, st.session_state.get("years_with_curr_manager", 5), key="years_with_curr_manager"
+)
+job_involvement = st.sidebar.slider(
+    "Job Involvement (1-4)", 1, 4, st.session_state.get("job_involvement", 3), key="job_involvement"
+)
+years_at_company = st.sidebar.slider(
+    "Years at Company", 0, 40, st.session_state.get("years_at_company", 5), key="years_at_company"
+)
+job_satisfaction = st.sidebar.slider(
+    "Job Satisfaction (1-4)", 1, 4, st.session_state.get("job_satisfaction", 3), key="job_satisfaction"
+)
+marital_status = st.sidebar.selectbox(
+    "Marital Status", ["Single", "Married", "Divorced"], index=["Single", "Married", "Divorced"].index(st.session_state.get("marital_status", "Single")), key="marital_status"
+)
+stock_option_level = st.sidebar.slider(
+    "Stock Option Level (0-3)", 0, 3, st.session_state.get("stock_option_level", 0), key="stock_option_level"
+)
+hourly_rate = st.sidebar.number_input(
+    "Hourly Rate (e.g., 40)", min_value=10, max_value=100, value=st.session_state.get("hourly_rate", 40), key="hourly_rate"
+)
+daily_rate = st.sidebar.number_input(
+    "Daily Rate (e.g., 800)", min_value=100, max_value=2000, value=st.session_state.get("daily_rate", 800), key="daily_rate"
+)
+performance_rating = st.sidebar.slider(
+    "Performance Rating (1-4)", 1, 4, st.session_state.get("performance_rating", 3), key="performance_rating"
+)
+years_in_current_role = st.sidebar.slider(
+    "Years in Current Role", 0, 20, st.session_state.get("years_in_current_role", 5), key="years_in_current_role"
+)
+training_times_last_year = st.sidebar.slider(
+    "Training Times Last Year", 0, 10, st.session_state.get("training_times_last_year", 3), key="training_times_last_year"
+)
+business_travel = st.sidebar.selectbox(
+    "Business Travel",
+    ["Travel_Rarely", "Travel_Frequently", "Non-Travel"],
+    index=["Travel_Rarely", "Travel_Frequently", "Non-Travel"].index(st.session_state.get("business_travel", "Travel_Rarely")),
+    key="business_travel",
+)
+distance_from_home = st.sidebar.number_input(
+    "Distance from Home (e.g., 10)", min_value=0, max_value=50, value=st.session_state.get("distance_from_home", 10), key="distance_from_home"
+)
+education_field = st.sidebar.selectbox(
+    "Education Field",
+    ["Life Sciences", "Medical", "Marketing", "Technical Degree", "Other"],
+    index=["Life Sciences", "Medical", "Marketing", "Technical Degree", "Other"].index(st.session_state.get("education_field", "Life Sciences")),
+    key="education_field",
+)
+years_since_last_promotion = st.sidebar.slider(
+    "Years Since Last Promotion", 0, 20, st.session_state.get("years_since_last_promotion", 1), key="years_since_last_promotion"
+)
+total_working_years = st.sidebar.slider(
+    "Total Working Years", 0, 40, st.session_state.get("total_working_years", 10), key="total_working_years"
+)
+num_companies_worked = st.sidebar.slider(
+    "Number of Companies Worked", 0, 20, st.session_state.get("num_companies_worked", 2), key="num_companies_worked"
+)
+job_role = st.sidebar.selectbox(
+    "Job Role",
+    ["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"],
+    index=["Sales Executive", "Manager", "Research Scientist", "Laboratory Technician", "Other"].index(st.session_state.get("job_role", "Sales Executive")),
+    key="job_role",
+)
+job_level = st.sidebar.slider(
+    "Job Level (1-5)", 1, 5, st.session_state.get("job_level", 2), key="job_level"
+)
+work_life_balance = st.sidebar.slider(
+    "Work-Life Balance (1-4)", 1, 4, st.session_state.get("work_life_balance", 3), key="work_life_balance"
+)
+gender = st.sidebar.selectbox(
+    "Gender", ["Male", "Female"], index=["Male", "Female"].index(st.session_state.get("gender", "Male")), key="gender"
+)
+department = st.sidebar.selectbox(
+    "Department",
+    ["Sales", "Research & Development", "Human Resources"],
+    index=["Sales", "Research & Development", "Human Resources"].index(st.session_state.get("department", "Sales")),
+    key="department",
+)
+education = st.sidebar.slider(
+    "Education Level (1-5)", 1, 5, st.session_state.get("education", 3), key="education"
+)
 
 # Encode categorical variables
 marital_status_mapping = {"Single": 0, "Married": 1, "Divorced": 2}
