@@ -66,22 +66,6 @@ department_mapping = {"Sales": 0, "Research & Development": 1, "Human Resources"
 education_field_mapping = {"Life Sciences": 0, "Medical": 1, "Marketing": 2, "Technical Degree": 3, "Other": 4}
 job_role_mapping = {"Sales Executive": 0, "Manager": 1, "Research Scientist": 2, "Laboratory Technician": 3, "Other": 4}
 
-# Define numeric and categorical columns based on the preprocessor details
-numeric_columns = [
-    'Age', 'DailyRate', 'DistanceFromHome', 'Education',
-    'EnvironmentSatisfaction', 'HourlyRate', 'JobInvolvement', 'JobLevel',
-    'JobSatisfaction', 'MonthlyIncome', 'MonthlyRate', 'NumCompaniesWorked',
-    'PercentSalaryHike', 'PerformanceRating', 'RelationshipSatisfaction',
-    'StockOptionLevel', 'TotalWorkingYears', 'TrainingTimesLastYear',
-    'WorkLifeBalance', 'YearsAtCompany', 'YearsInCurrentRole',
-    'YearsSinceLastPromotion', 'YearsWithCurrManager'
-]
-
-categorical_columns = [
-    'BusinessTravel', 'Department', 'EducationField', 'Gender',
-    'JobRole', 'MaritalStatus', 'OverTime'
-]
-
 # Prepare input data
 input_data = pd.DataFrame({
     "Age": [age],
@@ -116,38 +100,33 @@ input_data = pd.DataFrame({
     "Education": [education],
 })
 
-# Align and sanitize input data
-for col in numeric_columns:
-    if col not in input_data.columns:
-        input_data[col] = 0
-
-for col in categorical_columns:
-    if col not in input_data.columns:
-        input_data[col] = "Unknown"
-
-input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
-
-# Debug input data
-st.write("Final Input Data:")
-st.write(input_data)
-
 try:
-    # Preprocess input data
+    # Debugging steps
+    st.write("Debugging Input Data")
+    st.write("Data Types:")
+    st.write(input_data.dtypes)
+
+    # Align numeric and categorical data
+    numeric_columns = preprocessor.transformers[0][2]
+    input_data[numeric_columns] = input_data[numeric_columns].astype('float64')
+
+    categorical_columns = preprocessor.transformers[1][2]
+    input_data[categorical_columns] = input_data[categorical_columns].astype(str)
+
+    # Fill missing values
+    input_data.fillna(0, inplace=True)
+
+    # Preprocess
     input_array = preprocessor.transform(input_data)
 
-    # Predict using Neural Network
+    # Predict
     nn_predictions = nn_model.predict(input_array).flatten()
+    hybrid_features = np.column_stack((input_array, nn_predictions))
+    hybrid_predictions = hybrid_model.predict(hybrid_features)
 
-    # Create hybrid features
-    input_hybrid = np.column_stack((input_array, nn_predictions))
-
-    # Predict using Hybrid NN-XGBoost
-    hybrid_predictions = hybrid_model.predict(input_hybrid)
-
-    # Display predictions
-    st.subheader("Prediction Results")
+    # Display results
     prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-    st.write(f"Will the employee leave? **{prediction}**")
+    st.subheader(f"Will the employee leave? **{prediction}**")
 
 except Exception as e:
     st.error(f"Error during preprocessing: {e}")
