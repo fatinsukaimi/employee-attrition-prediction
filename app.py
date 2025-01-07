@@ -3,65 +3,57 @@ import pandas as pd
 import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
-import shap
 
-# Load the preprocessor and models
-preprocessor = joblib.load('preprocessor.pkl')
-hybrid_model = joblib.load('hybrid_model.pkl')
-nn_model = load_model('nn_model.keras')
+# Load models and preprocessor
+nn_model = load_model("nn_model.keras")
+hybrid_model = joblib.load("hybrid_model.pkl")
+preprocessor = joblib.load("preprocessor.pkl")
 
-# Title and Description
+# Title
 st.title("Employee Attrition Prediction")
-st.write("Predict the likelihood of an employee leaving the company based on various factors.")
 
-# Input Form
+# Sidebar Inputs
 st.sidebar.header("Employee Features")
-Age = st.sidebar.slider("Age", 18, 60, 30)
-MonthlyIncome = st.sidebar.slider("Monthly Income", 1000, 20000, 5000)
-OverTime = st.sidebar.selectbox("Works Overtime?", ["Yes", "No"])
-EnvironmentSatisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
-RelationshipSatisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-PercentSalaryHike = st.sidebar.slider("Percent Salary Hike", 0, 50, 10)
-YearsWithCurrManager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
-JobInvolvement = st.sidebar.slider("Job Involvement (1-4)", 1, 4, 3)
+age = st.sidebar.slider("Age", 18, 65, 30)
+monthly_income = st.sidebar.number_input("Monthly Income (e.g., 5000)", min_value=1000, step=500)
+overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
+environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
+relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
+percent_salary_hike = st.sidebar.slider("Percent Salary Hike (%)", 0, 50, 10)
+years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
+job_involvement = st.sidebar.slider("Job Involvement (1-4)", 1, 4, 3)
 
-# Collect inputs into a DataFrame
+# Ensure input matches the exact feature names of the preprocessor
 input_data = pd.DataFrame({
-    'Age': [Age],
-    'MonthlyIncome': [MonthlyIncome],
-    'OverTime': [OverTime],
-    'EnvironmentSatisfaction': [EnvironmentSatisfaction],
-    'RelationshipSatisfaction': [RelationshipSatisfaction],
-    'PercentSalaryHike': [PercentSalaryHike],
-    'YearsWithCurrManager': [YearsWithCurrManager],
-    'JobInvolvement': [JobInvolvement]
+    "Age": [age],
+    "MonthlyIncome": [monthly_income],
+    "OverTime_Yes": [1 if overtime == "Yes" else 0],
+    "EnvironmentSatisfaction": [environment_satisfaction],
+    "RelationshipSatisfaction": [relationship_satisfaction],
+    "PercentSalaryHike": [percent_salary_hike],
+    "YearsWithCurrManager": [years_with_curr_manager],
+    "JobInvolvement": [job_involvement],
 })
 
-# Preprocess inputs
-st.write("## Input Data")
-st.write(input_data)
-X_processed = preprocessor.transform(input_data)
+# Preprocess input data
+try:
+    input_array = preprocessor.transform(input_data)
+except ValueError as e:
+    st.error(f"Error during preprocessing: {e}")
+    st.stop()
 
-# Neural Network Prediction
-nn_predictions = nn_model.predict(X_processed).flatten()
+# Predict using Neural Network
+nn_predictions = nn_model.predict(input_array).flatten()
 
-# Combine NN predictions with preprocessed data
-X_hybrid = np.column_stack((X_processed, nn_predictions))
+# Create hybrid features
+input_hybrid = np.column_stack((input_array, nn_predictions))
 
-# Hybrid Model Prediction
-hybrid_prediction = hybrid_model.predict_proba(X_hybrid)[:, 1]
+# Predict using Hybrid NN-XGBoost
+hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-# Display Prediction
-st.write("## Prediction")
-attrition_probability = hybrid_prediction[0]
-if attrition_probability > 0.5:
-    st.error(f"The employee is likely to leave. Probability: {attrition_probability:.2f}")
+# Display predictions
+st.subheader("Prediction Results")
+if hybrid_predictions[0] == 1:
+    st.write("The employee is likely to leave the company.")
 else:
-    st.success(f"The employee is likely to stay. Probability: {attrition_probability:.2f}")
-
-# SHAP Explanation
-explainer = shap.TreeExplainer(hybrid_model)
-shap_values = explainer.shap_values(X_hybrid)
-
-st.write("## Feature Contribution")
-shap.force_plot(explainer.expected_value, shap_values[0, :], input_data, matplotlib=True)
+    st.write("The employee is likely to stay in the company.")
