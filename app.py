@@ -105,4 +105,12 @@ if st.button("Predict"):
         hybrid_predictions = hybrid_model.predict(input_hybrid)
 
         # Display predictions
-        st.subhe
+        st.subheader("Prediction Results")
+        st.write("Will the employee leave?")
+        if not st.session_state.reset_prediction:
+            prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+            # Display the prediction directly underneath
+            st.markdown(f"### **{prediction}**")
+
+    except Exception as e:
+        st.error(f"Error during processing: {e}")
