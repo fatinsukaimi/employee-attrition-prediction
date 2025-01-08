@@ -41,13 +41,43 @@ monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", valu
 monthly_income = clean_and_convert_input(monthly_income_input)
 years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
 
-# Prepare input data with only the selected features
+# Default values for the hidden features
+default_values = {
+    "JobSatisfaction": 3,
+    "MaritalStatus": 0,
+    "StockOptionLevel": 0,
+    "HourlyRate": 50,
+    "NumCompaniesWorked": 2,
+    "JobRole": 0,
+    "DailyRate": 800,
+    "YearsAtCompany": 5,
+    "PerformanceRating": 3,
+    "YearsInCurrentRole": 3,
+    "MonthlyRate": 15000,
+    "JobInvolvement": 3,
+    "TrainingTimesLastYear": 3,
+    "BusinessTravel": 1,
+    "DistanceFromHome": 10,
+    "EducationField": 0,
+    "YearsSinceLastPromotion": 1,
+    "TotalWorkingYears": 10,
+    "JobLevel": 2,
+    "WorkLifeBalance": 3,
+    "PercentSalaryHike": 10,
+    "Age": 30,
+    "Education": 3,
+    "Gender": 0,
+    "Department": 1,
+}
+
+# Combine input and default values
 input_data = pd.DataFrame({
     "OverTime": [1 if overtime == "Yes" else 0],
     "EnvironmentSatisfaction": [environment_satisfaction],
     "RelationshipSatisfaction": [relationship_satisfaction],
     "MonthlyIncome": [monthly_income],
     "YearsWithCurrManager": [years_with_curr_manager],
+    **{key: [value] for key, value in default_values.items()}
 })
 
 # Process and Predict Button
