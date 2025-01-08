@@ -32,7 +32,7 @@ with col1:
     if st.button("Predict"):
         st.session_state.reset_prediction = False
         try:
-            # Prepare input data
+            # Prepare input data for the top 5 features
             input_data = pd.DataFrame({
                 "OverTime": [1 if overtime == "Yes" else 0],
                 "EnvironmentSatisfaction": [environment_satisfaction],
@@ -40,6 +40,15 @@ with col1:
                 "MonthlyIncome": [monthly_income],
                 "YearsWithCurrManager": [years_with_curr_manager],
             })
+
+            # Add missing columns with default values
+            all_columns = [name for transformer in preprocessor.transformers_ for name in transformer[2]]
+            for col in all_columns:
+                if col not in input_data.columns:
+                    input_data[col] = 0  # Fill missing columns with 0
+
+            # Ensure column order matches the preprocessor
+            input_data = input_data[all_columns]
 
             # Preprocess inputs
             input_array = preprocessor.transform(input_data)
