@@ -48,17 +48,39 @@ with col1:
             # Ensure column order matches the preprocessor
             input_data = input_data[all_columns]
 
+            # Debugging Logs
+            st.write("### Input DataFrame (Before Processing):")
+            st.write(input_data)
+            st.write("### Data Types:")
+            st.write(input_data.dtypes)
+
             # Convert all columns to numeric types explicitly
             input_data = input_data.astype(float)
+
+            # Debugging Logs
+            st.write("### Input DataFrame (After Type Conversion):")
+            st.write(input_data)
 
             # Preprocess inputs
             input_array = preprocessor.transform(input_data)
 
+            # Debugging Logs
+            st.write("### Preprocessed Input Array:")
+            st.write(input_array)
+
             # Predict using Neural Network
             nn_predictions = nn_model.predict(input_array).flatten()
 
+            # Debugging Logs
+            st.write("### Neural Network Predictions:")
+            st.write(nn_predictions)
+
             # Combine features for Hybrid Model
             input_hybrid = np.column_stack((input_array, nn_predictions))
+
+            # Debugging Logs
+            st.write("### Hybrid Input Array:")
+            st.write(input_hybrid)
 
             # Predict using Hybrid NN-XGBoost
             hybrid_predictions = hybrid_model.predict(input_hybrid)
