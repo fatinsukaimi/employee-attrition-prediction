@@ -24,17 +24,13 @@ else:
 
 # Main Input Section
 st.header("Input Features")
-col1, col2 = st.columns(2)
 
-# Inputs for the top features in columns
-with col1:
-    overtime = st.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
-    environment_satisfaction = st.slider("Environment Satisfaction (1-4)", 1, 4, 3)
-
-with col2:
-    relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-    monthly_income = st.text_input("Monthly Income (e.g., 5000)", value="5000")
-    years_with_curr_manager = st.slider("Years With Current Manager", 0, 20, 5)
+# Inputs for the top features in a stacked layout
+overtime = st.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
+environment_satisfaction = st.slider("Environment Satisfaction (1-4)", 1, 4, 3)
+relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
+monthly_income = st.text_input("Monthly Income (e.g., 5000)", value="5000")
+years_with_curr_manager = st.slider("Years With Current Manager", 0, 20, 5)
 
 # Default values for other features
 default_values = {
