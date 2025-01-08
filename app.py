@@ -9,8 +9,9 @@ nn_model = load_model("nn_model.keras")
 hybrid_model = joblib.load("hybrid_model.pkl")
 preprocessor = joblib.load("preprocessor.pkl")
 
-# Title
+# Title and Subtitle
 st.title("Employee Attrition Prediction")
+st.markdown("This application predicts employee attrition using a hybrid Neural Network and XGBoost model.")
 
 # Sidebar Inputs
 st.sidebar.header("Employee Features")
