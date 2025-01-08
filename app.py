@@ -15,8 +15,6 @@ st.write("This application predicts employee attrition using a hybrid Neural Net
 
 # User Input Form for Top 5 Features
 st.write("### Input Employee Features")
-
-# Top 5 features form
 overtime = st.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
 environment_satisfaction = st.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
@@ -49,6 +47,9 @@ with col1:
 
             # Ensure column order matches the preprocessor
             input_data = input_data[all_columns]
+
+            # Convert all columns to numeric types explicitly
+            input_data = input_data.astype(float)
 
             # Preprocess inputs
             input_array = preprocessor.transform(input_data)
