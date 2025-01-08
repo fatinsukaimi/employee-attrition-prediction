@@ -98,18 +98,12 @@ categorical_columns = [
 input_data[numerical_columns] = input_data[numerical_columns].astype('float64')
 input_data[categorical_columns] = input_data[categorical_columns].astype(str)
 
-# Debugging: Display the input data
-st.write("Input Data (Before Processing):", input_data)
-
 # Process and Predict Button
 if st.button("Predict"):
     st.session_state.reset_prediction = False
     try:
         # Preprocess
         input_array = preprocessor.transform(input_data)
-
-        # Debugging: Display the processed array
-        st.write("Processed Array:", input_array)
 
         # Predict using Neural Network
         nn_predictions = nn_model.predict(input_array).flatten()
