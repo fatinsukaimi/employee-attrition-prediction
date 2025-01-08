@@ -96,20 +96,21 @@ if st.button("Predict"):
         input_array = preprocessor.transform(input_data)
 
         # Predict using Neural Network
-        nn_predictions = nn_model.predict(input_array).flatten()  # Assuming probabilities
-        nn_attrition_prob = nn_predictions[0]  # Probability of attrition (from NN)
+        nn_predictions = nn_model.predict(input_array).flatten()
 
         # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
         # Predict using Hybrid NN-XGBoost
-        hybrid_probabilities = hybrid_model.predict_proba(input_hybrid)  # Get probabilities
-        attrition_probability = hybrid_probabilities[0][1]  # Probability of attrition (class 1)
+        hybrid_predictions = hybrid_model.predict(input_hybrid)
 
-        # Display results
-        st.write("### Prediction Result")
-        st.write(f"Will the employee leave the company? {'Yes' if attrition_probability >= 0.5 else 'No'}")
-        st.write(f"Probability of Attrition: {attrition_probability:.2f}")
+        # Display predictions
+        st.subheader("Prediction Results")
+        st.write("Is the employee potential to leave?")
+        if not st.session_state.reset_prediction:
+            prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+            # Display the prediction directly underneath
+            st.markdown(f"### **{prediction}**")
 
     except Exception as e:
         st.error(f"Error during processing: {e}")
