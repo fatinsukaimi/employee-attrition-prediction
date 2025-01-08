@@ -13,34 +13,28 @@ preprocessor = joblib.load("preprocessor.pkl")
 st.title("Employee Attrition Prediction")
 st.markdown("This application predicts employee attrition using a hybrid Neural Network and XGBoost model.")
 
-# Sidebar Inputs
-st.sidebar.header("Employee Features")
-
 # Add Reset Prediction button at the top
 if "reset_prediction" not in st.session_state:
     st.session_state.reset_prediction = False
 
-if st.sidebar.button("Reset Prediction"):
+if st.button("Reset"):
     st.session_state.reset_prediction = True
 else:
     st.session_state.reset_prediction = False
 
-# Helper function to clean and convert numeric inputs
-def clean_and_convert_input(input_value):
-    try:
-        cleaned_value = input_value.replace(',', '').replace(' ', '')
-        return float(cleaned_value)
-    except ValueError:
-        st.error(f"Invalid input: {input_value}. Please enter a valid number.")
-        return None
+# Main Input Section
+st.header("Input Features")
+col1, col2 = st.columns(2)
 
-# Inputs for top features
-overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
-environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
-relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
-monthly_income = clean_and_convert_input(monthly_income_input)
-years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
+# Inputs for the top features in columns
+with col1:
+    overtime = st.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
+    environment_satisfaction = st.slider("Environment Satisfaction (1-4)", 1, 4, 3)
+
+with col2:
+    relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
+    monthly_income = st.text_input("Monthly Income (e.g., 5000)", value="5000")
+    years_with_curr_manager = st.slider("Years With Current Manager", 0, 20, 5)
 
 # Default values for other features
 default_values = {
@@ -56,7 +50,6 @@ default_values = {
     "NumCompaniesWorked": 2,
     "PercentSalaryHike": 10,
     "PerformanceRating": 3,
-    "RelationshipSatisfaction": 3,
     "StockOptionLevel": 0,
     "TotalWorkingYears": 10,
     "TrainingTimesLastYear": 3,
@@ -77,7 +70,7 @@ input_data = pd.DataFrame({
     "OverTime": [1 if overtime == "Yes" else 0],
     "EnvironmentSatisfaction": [environment_satisfaction],
     "RelationshipSatisfaction": [relationship_satisfaction],
-    "MonthlyIncome": [monthly_income],
+    "MonthlyIncome": [float(monthly_income)],
     "YearsWithCurrManager": [years_with_curr_manager],
     **{key: [value] for key, value in default_values.items()}
 })
@@ -99,7 +92,7 @@ categorical_columns = [
 input_data[numerical_columns] = input_data[numerical_columns].astype('float64')
 input_data[categorical_columns] = input_data[categorical_columns].astype(str)
 
-# Process and Predict Button
+# Prediction Button
 if st.button("Predict"):
     st.session_state.reset_prediction = False
     try:
