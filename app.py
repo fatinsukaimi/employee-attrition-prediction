@@ -106,7 +106,7 @@ if st.button("Predict"):
 
         # Display predictions
         st.subheader("Prediction Results")
-        st.write("Will the employee leave?")
+        st.write("Is the employee potential to leave?")
         if not st.session_state.reset_prediction:
             prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
             # Display the prediction directly underneath
