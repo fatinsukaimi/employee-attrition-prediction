@@ -23,7 +23,7 @@ relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3
 monthly_income = st.number_input("Monthly Income (e.g., 5000)", min_value=1000, max_value=20000, step=1000, value=5000)
 years_with_curr_manager = st.number_input("Years With Current Manager", min_value=0, max_value=20, step=1, value=5)
 
-# Reset and Predict Buttons
+# Predict and Reset Buttons
 col1, col2 = st.columns(2)
 if "reset_prediction" not in st.session_state:
     st.session_state.reset_prediction = False
@@ -41,7 +41,7 @@ with col1:
                 "YearsWithCurrManager": [years_with_curr_manager],
             })
 
-            # Add missing columns with default values
+            # Dynamically add the "hidden" columns with default values
             all_columns = [name for transformer in preprocessor.transformers_ for name in transformer[2]]
             for col in all_columns:
                 if col not in input_data.columns:
