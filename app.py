@@ -54,12 +54,17 @@ with col1:
             st.write("### Data Types:")
             st.write(input_data.dtypes)
 
-            # Convert all columns to numeric types explicitly
-            input_data = input_data.astype(float)
+            # Convert all columns to numeric explicitly
+            input_data = input_data.apply(pd.to_numeric, errors="coerce")
 
             # Debugging Logs
             st.write("### Input DataFrame (After Type Conversion):")
             st.write(input_data)
+
+            # Check for NaNs and replace them with zeros
+            if input_data.isnull().values.any():
+                st.warning("Input data contained NaN values. Replacing with 0.")
+                input_data = input_data.fillna(0)
 
             # Preprocess inputs
             input_array = preprocessor.transform(input_data)
@@ -71,16 +76,8 @@ with col1:
             # Predict using Neural Network
             nn_predictions = nn_model.predict(input_array).flatten()
 
-            # Debugging Logs
-            st.write("### Neural Network Predictions:")
-            st.write(nn_predictions)
-
             # Combine features for Hybrid Model
             input_hybrid = np.column_stack((input_array, nn_predictions))
-
-            # Debugging Logs
-            st.write("### Hybrid Input Array:")
-            st.write(input_hybrid)
 
             # Predict using Hybrid NN-XGBoost
             hybrid_predictions = hybrid_model.predict(input_hybrid)
