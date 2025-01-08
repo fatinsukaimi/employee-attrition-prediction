@@ -13,24 +13,24 @@ preprocessor = joblib.load("preprocessor.pkl")
 st.title("Employee Attrition Prediction")
 st.markdown("This application predicts employee attrition using a hybrid Neural Network and XGBoost model.")
 
+# Sidebar Inputs
+st.sidebar.header("Employee Features")
+
 # Add Reset Prediction button at the top
 if "reset_prediction" not in st.session_state:
     st.session_state.reset_prediction = False
 
-if st.button("Reset"):
+if st.sidebar.button("Reset Prediction"):
     st.session_state.reset_prediction = True
 else:
     st.session_state.reset_prediction = False
 
-# Main Input Section
-st.header("Input Features")
-
-# Inputs for the top features in a stacked layout
-overtime = st.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
-environment_satisfaction = st.slider("Environment Satisfaction (1-4)", 1, 4, 3)
-relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-monthly_income = st.text_input("Monthly Income (e.g., 5000)", value="5000")
-years_with_curr_manager = st.slider("Years With Current Manager", 0, 20, 5)
+# Inputs in the sidebar
+overtime = st.sidebar.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
+environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
+relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
+monthly_income = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
+years_with_curr_manager = st.sidebar.slider("Years With Current Manager", 0, 20, 5)
 
 # Default values for other features
 default_values = {
