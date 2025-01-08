@@ -11,61 +11,69 @@ preprocessor = joblib.load("preprocessor.pkl")
 
 # Title
 st.title("Employee Attrition Prediction")
-st.write("This application predicts employee attrition using the top 5 important features.")
 
-# Input for Top 5 Features
-overtime = st.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
-environment_satisfaction = st.slider("Environment Satisfaction (1-4)", 1, 4, 3)
-relationship_satisfaction = st.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-monthly_income = st.number_input("Monthly Income (e.g., 5000)", min_value=1000, max_value=20000, step=1000, value=5000)
-years_with_curr_manager = st.number_input("Years With Current Manager", min_value=0, max_value=20, step=1, value=5)
+# Sidebar Inputs
+st.sidebar.header("Employee Features")
 
-# Predict Button
-if st.button("Predict"):
+# Add Reset Prediction button at the top
+if "reset_prediction" not in st.session_state:
+    st.session_state.reset_prediction = False
+
+if st.sidebar.button("Reset Prediction"):
+    st.session_state.reset_prediction = True
+else:
+    st.session_state.reset_prediction = False
+
+# Helper function to clean and convert numeric inputs
+def clean_and_convert_input(input_value):
     try:
-        # Prepare input data for the top 5 features
-        input_data = pd.DataFrame({
-            "OverTime": [1 if overtime == "Yes" else 0],
-            "EnvironmentSatisfaction": [environment_satisfaction],
-            "RelationshipSatisfaction": [relationship_satisfaction],
-            "MonthlyIncome": [monthly_income],
-            "YearsWithCurrManager": [years_with_curr_manager],
-        })
+        cleaned_value = input_value.replace(',', '').replace(' ', '')
+        return float(cleaned_value)
+    except ValueError:
+        st.error(f"Invalid input: {input_value}. Please enter a valid number.")
+        return None
 
-        # Fill the rest of the columns with default values
-        all_columns = [name for transformer in preprocessor.transformers_ for name in transformer[2]]
-        for col in all_columns:
-            if col not in input_data.columns:
-                input_data[col] = 0  # Default value for missing columns
+# Inputs for top features
+overtime = st.sidebar.selectbox("OverTime (Yes/No)", ["Yes", "No"])
+environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
+relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
+monthly_income_input = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
+monthly_income = clean_and_convert_input(monthly_income_input)
+years_with_curr_manager = st.sidebar.slider("Years with Current Manager", 0, 20, 5)
 
-        # Ensure column order matches the preprocessor
-        input_data = input_data[all_columns]
+# Prepare input data with only the selected features
+input_data = pd.DataFrame({
+    "OverTime": [1 if overtime == "Yes" else 0],
+    "EnvironmentSatisfaction": [environment_satisfaction],
+    "RelationshipSatisfaction": [relationship_satisfaction],
+    "MonthlyIncome": [monthly_income],
+    "YearsWithCurrManager": [years_with_curr_manager],
+})
 
-        # Convert all columns to numeric explicitly
-        input_data = input_data.astype("float64")  # Convert all data to float64
+# Process and Predict Button
+if st.button("Predict"):
+    st.session_state.reset_prediction = False
+    try:
+        # Ensure numeric types
+        input_data = input_data.astype('float64')
 
-        # Debugging: Show input data before processing
-        st.write("### Input DataFrame (Before Processing):")
-        st.write(input_data)
-
-        # Preprocess inputs
+        # Preprocess
         input_array = preprocessor.transform(input_data)
 
         # Predict using Neural Network
         nn_predictions = nn_model.predict(input_array).flatten()
 
-        # Combine features for Hybrid Model
+        # Create hybrid features
         input_hybrid = np.column_stack((input_array, nn_predictions))
 
         # Predict using Hybrid NN-XGBoost
         hybrid_predictions = hybrid_model.predict(input_hybrid)
-        attrition_probability = hybrid_model.predict_proba(input_hybrid)[:, 1]
 
-        # Display Predictions
+        # Display predictions
         st.subheader("Prediction Results")
-        prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
-        st.write(f"Will the employee leave? **{prediction}**")
-        st.write(f"Probability of Attrition: **{attrition_probability[0]:.2f}**")
+        if not st.session_state.reset_prediction:
+            prediction = "Yes" if hybrid_predictions[0] == 1 else "No"
+            st.write(f"Will the employee leave? **{prediction}**")
 
     except Exception as e:
-        st.error(f"Error during prediction: {e}")
+        st.error(f"Error during processing: {e}")
