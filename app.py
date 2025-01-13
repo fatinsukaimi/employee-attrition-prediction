@@ -25,14 +25,14 @@ if st.sidebar.button("Reset Prediction"):
 else:
     st.session_state.reset_prediction = False
 
-# Inputs in the sidebar
+# Inputs in the sidebar for top 5 SHAP features
+percent_salary_hike = st.sidebar.slider("Percent Salary Hike (%)", 0, 50, 10)
+monthly_income = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
 overtime = st.sidebar.selectbox("OverTime (Yes=1, No=0)", ["Yes", "No"])
 environment_satisfaction = st.sidebar.slider("Environment Satisfaction (1-4)", 1, 4, 3)
 relationship_satisfaction = st.sidebar.slider("Relationship Satisfaction (1-4)", 1, 4, 3)
-monthly_income = st.sidebar.text_input("Monthly Income (e.g., 5000)", value="5000")
-years_with_curr_manager = st.sidebar.slider("Years With Current Manager", 0, 20, 5)
 
-# Default values for other features
+# Default values for other columns to avoid errors
 default_values = {
     "Age": 30,
     "DailyRate": 800,
@@ -44,7 +44,6 @@ default_values = {
     "JobSatisfaction": 3,
     "MonthlyRate": 15000,
     "NumCompaniesWorked": 2,
-    "PercentSalaryHike": 10,
     "PerformanceRating": 3,
     "StockOptionLevel": 0,
     "TotalWorkingYears": 10,
@@ -53,6 +52,7 @@ default_values = {
     "YearsAtCompany": 5,
     "YearsInCurrentRole": 3,
     "YearsSinceLastPromotion": 1,
+    "YearsWithCurrManager": 5,
     "BusinessTravel": "Travel_Rarely",
     "Department": "Research & Development",
     "EducationField": "Life Sciences",
@@ -61,13 +61,13 @@ default_values = {
     "MaritalStatus": "Single",
 }
 
-# Combine user inputs and default values
+# Combine user inputs (top 5 features) with default values for other columns
 input_data = pd.DataFrame({
+    "PercentSalaryHike": [percent_salary_hike],
+    "MonthlyIncome": [float(monthly_income)],
     "OverTime": [1 if overtime == "Yes" else 0],
     "EnvironmentSatisfaction": [environment_satisfaction],
     "RelationshipSatisfaction": [relationship_satisfaction],
-    "MonthlyIncome": [float(monthly_income)],
-    "YearsWithCurrManager": [years_with_curr_manager],
     **{key: [value] for key, value in default_values.items()}
 })
 
